@@ -4,7 +4,6 @@
 % coordinated motion from random position and velocities.
 %
 
-
 %% Test of native matlab interface
 
 clear all;
@@ -305,7 +304,10 @@ map = [];
 pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
 plot_trajectories_offline(pos_history, N, [], fontsize, map);
+<<<<<<< e0d9f6ceaf281214fc57216197158d07ccd4cdbb
 axis equal
+=======
+>>>>>>> Refactoring to use the Swarm method
 
 %% Show solver convergence
 
