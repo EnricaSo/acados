@@ -264,6 +264,7 @@ time_qp_sol = ocp.get('time_qp_sol');
 fprintf('\nstatus = %d, sqp_iter = %d,  time_int = %f [ms] (time_lin = %f [ms], time_qp_sol = %f [ms], time_reg = %f [ms])\n', status, sqp_iter, time_tot*1e3, time_lin*1e3, time_qp_sol*1e3, time_reg*1e3);
 % time_ext = %f [ms], time_ext*1e3,
 
+stat = ocp.get('stat');
 ocp.print('stat');
 
 %% Extract trajectories
