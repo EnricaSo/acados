@@ -16,12 +16,17 @@ function model = swarming_model(S)
 
 import casadi.*
 
+%% Add parameters
+
 %% Rename swarming parameters
 
-N = S.N; % number of agents in the swarm
-d_ref = S.d_ref; % reference distance among every couple of neighboring agents
-u_ref = S.u_ref; % reference direction of velocity for all agents
-v_ref = S.v_ref; % reference speed for all agents
+N = S.nb_agents; % nb of agents
+max_neig = S.max_neig; % number of neighbours
+v_ref = S.v_flock; % reference speed for all agents
+u_ref = S.u_migration; % reference direction of velocity for all agents
+d_ref = S.d;  % reference distance among every couple of neighboring agents
+max_a = S.max_a;
+r_comm = S.r;
 
 %% System dimensions
 
@@ -88,7 +93,6 @@ for agent = 1:N
     v_agent = v(agent_idx);
     % Direction term
     sym_dir(agent) = 1 - (v_agent'*u_ref)^2/(v_agent'*v_agent);
-    % sym_dir(agent) = (v_agent - v_ref*u_ref)'*(v_agent - v_ref*u_ref);
     % Navigation term
     sym_nav(agent) = v_agent'*v_agent - v_ref^2;
 end

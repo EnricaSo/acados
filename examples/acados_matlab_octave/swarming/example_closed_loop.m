@@ -12,24 +12,28 @@ end
 
 %% Arguments
 
-% Time parameters
-dt = 0.1; % sample time
-T = 4; % prediction horizon [s]
-nb_steps = floor(T/dt); % nb of time steps along the simulation
+% Import swarming param, in S structure
+run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
 
-% Structure S with the swarming parameters
-S.N = 3; % number of agents in the swarm
-S.d_ref = 5; % reference distance among every couple of neighboring agents
-S.u_ref = [1;0;0]; % reference direction of velocity for all agents
-S.v_ref = 6; % reference speed for all agents
+% Overwrite and add some param
+%S.nb_agents = 4;
 S.max_a = 2;
+S.d = 5;
 
-% Rename swarming parameters
-N = S.N;
-u_ref = S.u_ref;
-v_ref = S.v_ref;
+% Rename param
+N = S.nb_agents; % nb of agents
+max_neig = S.max_neig; % number of neighbours
+v_ref = S.v_flock;
+u_ref = S.u_migration;
+d_ref = S.d;
 max_a = S.max_a;
 
+% Time param for MPC
+dt = 0.1; % sample time [s]
+T = 4; % prediction horizon [s]
+nb_steps = floor(T/dt); % nb of steps over the prediction horizon
+T_sim = 20; % time of the whole simulation [S]
+nb_steps_sim = floor(T_sim/dt); % nb of steps over the whole simulation
 
 if 1
 	compile_interface = 'auto';
@@ -272,8 +276,6 @@ sim = acados_sim(sim_model, sim_opts);
 
 %% Closed loop simulation
 
-T_sim = 20; % time of the whole simulation
-nb_steps_sim = floor(T_sim/dt); % time of time steps during the simulation
 x_history = zeros(nx, nb_steps_sim+1);
 x_history(:,1) = x0;
 u_history = zeros(nu, nb_steps_sim);
@@ -354,27 +356,38 @@ u_history = u_history';
 pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
 
-%% Plots 
+%% Plots with swarming functions
 
-% Plot trajectories of the agents
-figure;
-for agent = 1:N
-    hold on;
-    plot3(pos_history(:,(agent-1)*3+1), pos_history(:,(agent-1)*3+2), ...
-        - pos_history(:,(agent-1)*3+3));
-end
-% title('Agents trajectories');
-xlabel('X Position [m]','fontsize',fontsize);
-ylabel('Y Position [m]','fontsize',fontsize);
-zlabel('Z Position [m]','fontsize',fontsize);
-view(2);
+% Add project to path
+addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
 
-% Plot control inputs of the agents
-figure;
-plot(time_history(1:(end-1)), u_history);
-xlim([0 time_history(end-1)]);
-xlabel('Time [s]','fontsize',fontsize);
-ylabel('Control inputs [m/s^2]','fontsize',fontsize);
+% Plot state variables
+colors = [];
+map = [];
+dirname = [];
+plot_state_variables_offline(time_history, pos_history, vel_history, ...
+    u_history, colors, S, [], fontsize, dirname);
+
+%% Plots without swarming functions
+
+% % Plot trajectories of the agents
+% figure;
+% for agent = 1:N
+%     hold on;
+%     plot3(pos_history(:,(agent-1)*3+1), pos_history(:,(agent-1)*3+2), ...
+%         - pos_history(:,(agent-1)*3+3));
+% end
+% % title('Agents trajectories');
+% xlabel('X Position [m]','fontsize',fontsize);
+% ylabel('Y Position [m]','fontsize',fontsize);
+% zlabel('Z Position [m]','fontsize',fontsize);
+% view(2);
+% 
+% figure;
+% plot(time_history(1:(end-1)), u_history);
+% xlim([0 time_history(end-1)]);
+% xlabel('Time [s]','fontsize',fontsize);
+% ylabel('Control inputs [m/s^2]','fontsize',fontsize);
 
 %% Show solver convergence
 

@@ -16,24 +16,24 @@ end
 
 %% Arguments
 
+% Import structure S with the swarming parameters
+run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
+
+% Add parameters to S
+S.d = 5;
+
+% Rename parameters
+N = S.nb_agents;
+
 % Time parameters
 dt = 0.1; % discretization step
 T = 10; % total time of the simulation
 nb_steps = floor(T/dt); % number of time steps during the simulation
 
-% Structure S with the swarming parameters
-S.N = 3; % number of agents in the swarm
-S.d_ref = 5; % reference distance among every couple of neighboring agents
-S.u_ref = [1;0;0]; % reference direction of velocity for all agents
-S.v_ref = 6; % reference speed for all agents
-
-% Rename parameters
-N = S.N; 
-
 % Initial conditions
-x0 = [10*rand(3*N,1); 2*rand(3*N,1)]; % initial condition (3D positions ...
-    % and velocities of N agents)
-u = zeros(N*3,1); % control input is null (acceleration)
+% x0 = [S.Pos0(:); S.Vel0(:)];
+x0 = [10*rand(3*N,1); 2*rand(3*N,1)];
+u = zeros(N*3,1);
 
 % Simulation parameters
 compile_interface = 'auto';
@@ -134,23 +134,36 @@ S_forw = sim.get('S_forw');
 Sx = sim.get('Sx');
 Su = sim.get('Su');
 
-%% Plot variables
+%% Plot variables without Swarm methods
 
-fontsize = 12; % font size for plots
+% fontsize = 12; % font size for plots
+% 
+% % Plot
+% pos_history = x_history(:,1:3*N);
+% vel_history = x_history(:,(3*N+1):end);
+% for agent = 1:N
+%     plot3(pos_history(:,(agent-1)*3+2), pos_history(:,(agent-1)*3+1), ...
+%         - pos_history(:,(agent-1)*3+3));
+%     hold on;
+% end
+% % title('Swarm trajectories');
+% xlabel('Y Position [m]','fontsize',fontsize);
+% ylabel('X Position [m]','fontsize',fontsize);
+% zlabel('Z Position [m]','fontsize',fontsize);
+% view(2);
+
+%% Plot variables with Swarm methods
+
+% Add project to path
+addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
+
+fontsize = 12;
+map = [];
 
 % Plot
 pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
-for agent = 1:N
-    plot3(pos_history(:,(agent-1)*3+2), pos_history(:,(agent-1)*3+1), ...
-        - pos_history(:,(agent-1)*3+3));
-    hold on;
-end
-% title('Swarm trajectories');
-xlabel('Y Position [m]','fontsize',fontsize);
-ylabel('X Position [m]','fontsize',fontsize);
-zlabel('Z Position [m]','fontsize',fontsize);
-view(2);
+plot_trajectories_offline(pos_history, N, [], fontsize, map);
 
 %% End of simulation
 

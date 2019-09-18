@@ -18,22 +18,21 @@ end
 
 %% Arguments
 
+% Import the S structure for swarming parameters
+run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
+
+% Add parameters
+S.d = 5;
+
 % Time parameters
 dt = 0.1; % discretization step
 T = 8; % total time horizon of the simulation
 nb_steps = floor(T/dt); % nb of time steps along the simulation
 
-% Structure S with the swarming parameters
-S.N = 3; % number of agents in the swarm
-S.d_ref = 5; % reference distance among every couple of neighboring agents
-S.u_ref = [1;0;0]; % reference direction of velocity for all agents
-S.v_ref = 6; % reference speed for all agents
-S.max_a = 2;
-
 % Rename swarming parameters
-N = S.N;
-u_ref = S.u_ref;
-v_ref = S.v_ref;
+N = S.nb_agents;
+u_ref = S.u_migration;
+v_ref = S.v_flock;
 max_a = S.max_a;
 
 if 1
@@ -269,8 +268,6 @@ ocp.print('stat');
 
 %% Extract trajectories
 
-fontsize = 12;
-
 time_history = linspace(0,T,nb_steps+1)';
 x_history = x';
 u_history = u';
@@ -278,27 +275,36 @@ pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
 
 
-%% Plots
+%% Plot variables without Swarm methods
 
-% Plot trajectories of the agents
-figure;
-for agent = 1:N
-    hold on;
-    plot3(pos_history(:,(agent-1)*3+1), pos_history(:,(agent-1)*3+2), ...
-        - pos_history(:,(agent-1)*3+3));
-end
-% title('Agents trajectories');
-xlabel('X Position [m]','fontsize',fontsize);
-ylabel('Y Position [m]','fontsize',fontsize);
-zlabel('Z Position [m]','fontsize',fontsize);
-view(2);
+% fontsize = 12; % font size for plots
+% 
+% % Plot
+% pos_history = x_history(:,1:3*N);
+% vel_history = x_history(:,(3*N+1):end);
+% for agent = 1:N
+%     plot3(pos_history(:,(agent-1)*3+2), pos_history(:,(agent-1)*3+1), ...
+%         - pos_history(:,(agent-1)*3+3));
+%     hold on;
+% end
+% % title('Swarm trajectories');
+% xlabel('Y Position [m]','fontsize',fontsize);
+% ylabel('X Position [m]','fontsize',fontsize);
+% zlabel('Z Position [m]','fontsize',fontsize);
+% view(2);
 
-% Plot control inputs of the agents
-figure;
-plot(time_history(1:(end-1)), u);
-xlim([0 time_history(end-1)]);
-xlabel('Time [s]','fontsize',fontsize);
-ylabel('Control inputs [m/s^2]','fontsize',fontsize);
+%% Plot variables with Swarm methods
+
+% Add project to path
+addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
+
+fontsize = 12;
+map = [];
+
+% Plot
+pos_history = x_history(:,1:3*N);
+vel_history = x_history(:,(3*N+1):end);
+plot_trajectories_offline(pos_history, N, [], fontsize, map);
 
 %% Show solver convergence
 
