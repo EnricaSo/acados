@@ -16,7 +16,8 @@ end
 run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
 
 % Overwrite and add some param
-%S.nb_agents = 4;
+% S.nb_agents = 5;
+% S.max_neig = 2;
 S.max_a = 2;
 S.d = 5;
 
@@ -105,7 +106,8 @@ y_ref_e = zeros(ny_e,1); % output reference in mayer term
 % x0 = [S.Pos0(:); S.Vel0(:)];
 %rand('seed', 1);
 pos0 = 10*rand(3*N,1);
-vel0 = 2*rand(3*N,1);
+%vel0 = 2*rand(3*N,1);
+vel0 = repmat([6;0;0],N,1) + 0.05*rand(3*N,1);
 x0 = [pos0; vel0];
 
 lh = - max_a * ones(nh, 1);

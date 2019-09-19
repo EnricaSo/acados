@@ -35,19 +35,19 @@ nu = 3 * N; % nb of control inputs
 
 %% Named symbolic variables
 
-p = SX.sym('p', 3*N); % 3D positions of the agents [m]
-v = SX.sym('v', 3*N); % 3D velocities of the agents [m/s]
+pos = SX.sym('p', 3*N); % 3D positions of the agents [m]
+vel = SX.sym('v', 3*N); % 3D velocities of the agents [m/s]
 u = SX.sym('a', 3*N); % 3D acceleration to apply to agents [m/s^2]
 
 %% Unnamed symbolic variables
 
-sym_x = vertcat(p, v);
+sym_x = vertcat(pos, vel);
 sym_xdot = SX.sym('xdot', nx, 1);
 sym_u = u;
 
 %% Dynamics
 
-expr_f_expl = vertcat(v, ...
+expr_f_expl = vertcat(vel, ...
                       u);
 expr_f_impl = expr_f_expl - sym_xdot;
 
@@ -72,6 +72,7 @@ sym_nav = SX.zeros(N,1);
 
 % Neighborhood matrix
 M = ones(N,N) - eye(N,N);
+% M = compute_neighborhood_casadi(pos, r_comm, max_neig);
 
 % For every agent define the nonlinear_ls terms
 for agent = 1:N
@@ -87,10 +88,10 @@ for agent = 1:N
             neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
         end
         % Separation term
-        p_rel = p(neig_idx)-p(agent_idx);
+        p_rel = pos(neig_idx)-pos(agent_idx);
         sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(p_rel'*p_rel - d_ref^2);
     end
-    v_agent = v(agent_idx);
+    v_agent = vel(agent_idx);
     % Direction term
     sym_dir(agent) = 1 - (v_agent'*u_ref)^2/(v_agent'*v_agent);
     % Navigation term
