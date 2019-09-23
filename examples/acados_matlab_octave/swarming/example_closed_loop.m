@@ -31,7 +31,7 @@ max_a = S.max_a;
 
 % Time param for MPC
 dt = 0.1; % sample time [s]
-T = 4; % prediction horizon [s]
+T = 2; % prediction horizon [s]
 nb_steps = floor(T/dt); % nb of steps over the prediction horizon
 T_sim = 20; % time of the whole simulation [S]
 nb_steps_sim = floor(T_sim/dt); % nb of steps over the whole simulation
