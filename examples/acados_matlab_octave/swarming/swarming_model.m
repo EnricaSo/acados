@@ -51,11 +51,6 @@ expr_f_expl = vertcat(vel, ...
                       u);
 expr_f_impl = expr_f_expl - sym_xdot;
 
-%% Constraints
-
-expr_h = sym_u; % constraints only on control inputs, for now
-% expr_h_e = sym_x;
-
 %% Nonlinear least squares
 
 % Weights
@@ -108,6 +103,25 @@ expr_y_e = vertcat(sym_sep, sym_dir, sym_nav);
 
 ny = length(expr_y);
 ny_e = length(expr_y_e);
+
+%% Constraints
+
+sym_dist = SX.zeros(N*(N-1)/2,1);
+
+k = 1;
+for agent = 1:(N-1)
+    agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
+    for neig = (agent+1):N
+        neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
+        p_rel = pos(neig_idx)-pos(agent_idx);
+        sym_dist(k) = p_rel(1)^2+p_rel(2)^2+p_rel(3)^2;
+        k = k+1;
+    end
+end
+
+expr_h = vertcat(sym_u, ...
+                 sym_dist); % constraints on control inputs and distances
+% expr_h_e = sym_x;
 
 %% Populate structure
 

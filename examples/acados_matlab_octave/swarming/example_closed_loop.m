@@ -28,6 +28,7 @@ v_ref = S.v_flock;
 u_ref = S.u_migration;
 d_ref = S.d;
 max_a = S.max_a;
+r_coll = S.r_coll;
 
 % Time param for MPC
 dt = 0.1; % sample time [s]
@@ -92,7 +93,8 @@ nbx = 0;
 nbu = 0;
 ng = 0;
 ng_e = 0;
-nh = nu;
+n_coll = N*(N-1)/2;
+nh = nu + n_coll;
 nh_e = 0;
 
 % Cost
@@ -110,8 +112,12 @@ pos0 = 10*rand(3*N,1);
 vel0 = repmat([6;0;0],N,1) + 0.05*rand(3*N,1);
 x0 = [pos0; vel0];
 
-lh = - max_a * ones(nh, 1);
-uh = max_a * ones(nh, 1);
+lu = - max_a * ones(nu, 1);
+uu = max_a * ones(nu, 1);
+l_coll = r_coll^2 * ones(n_coll,1);
+u_coll = 300^2 * ones(n_coll,1);
+lh = [lu; l_coll];
+uh = [uu; u_coll];
 %lh_e = zeros(nh_e, 1);
 %uh_e = zeros(nh_e, 1);
 
