@@ -23,7 +23,7 @@ import casadi.*
 N = S.nb_agents; % nb of agents
 max_neig = S.max_neig; % number of neighbours
 v_ref = S.v_flock; % reference speed for all agents
-u_ref = S.u_migration; % reference direction of velocity for all agents
+u_ref = S.u_migration; % reference velocity direction for all agents (unit vector)
 d_ref = S.d;  % reference distance among every couple of neighboring agents
 max_a = S.max_a;
 r_comm = S.r;
@@ -71,31 +71,36 @@ sym_nav = SX.zeros(N,1);
 %ny = N*(N+1);
 
 % Neighborhood matrix
-M = ones(N,N) - eye(N,N);
-% M = compute_neighborhood_casadi(pos, r_comm, max_neig);
+% M = ones(N,N) - eye(N,N);
+[~, sorted_neig] = compute_neighborhood_casadi(pos, r_comm, max_neig);
 
 % For every agent define the nonlinear_ls terms
 for agent = 1:N
     
     % Get the index triplet related to the current agent
     agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
-    
+    neigs = sorted_neig(:,agent);
     % For every neighbor, compute the distance to the current agent
-    for neig = 1:(N-1)
-        if neig < agent
-            neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
-        else
-            neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
-        end
+    for j = 1:max_neig
+        neig = neigs(j);
+        neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
         % Separation term
-        p_rel = pos(neig_idx)-pos(agent_idx);
-        sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(p_rel'*p_rel - d_ref^2);
+        pos_rel_cell = vertsplit(pos-repmat(pos(agent_idx),N,1));
+        pos_rel_default = [d_ref;0;0];
+        pos_rel = SX.zeros(3,1);
+        neig_idx_x = neig_idx(1)-1;
+        neig_idx_y = neig_idx(2)-1;
+        neig_idx_z = neig_idx(3)-1;
+        pos_rel(1) = conditional(neig_idx_x, pos_rel_cell, pos_rel_default(1), false);
+        pos_rel(2) = conditional(neig_idx_y, pos_rel_cell, pos_rel_default(2), false);
+        pos_rel(3) = conditional(neig_idx_z, pos_rel_cell, pos_rel_default(3), false);
+        sym_sep((agent-1)*(N-1)+j) = 1/(N-1)*(pos_rel'*pos_rel - d_ref^2);
     end
-    v_agent = vel(agent_idx);
+    vel_agent = vel(agent_idx);
     % Direction term
-    sym_dir(agent) = 1 - (v_agent'*u_ref)^2/(v_agent'*v_agent);
+    sym_dir(agent) = 1 - (vel_agent'*u_ref)^2/(vel_agent'*vel_agent);
     % Navigation term
-    sym_nav(agent) = v_agent'*v_agent - v_ref^2;
+    sym_nav(agent) = vel_agent'*vel_agent - v_ref^2;
 end
 
 sym_sep = W_sep * sym_sep;
