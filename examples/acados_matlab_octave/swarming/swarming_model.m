@@ -57,7 +57,7 @@ expr_f_impl = expr_f_expl - sym_xdot;
 W_sep = 1; 
 W_dir = 1;
 W_nav = 2;
-W_u = 1e-1; % Penalization of high values of the control input variables
+W_u = 2e-1; % Penalization of high values of the control input variables
 
 sym_sep = SX.zeros(N*(N-1),1);
 sym_dir = SX.zeros(N,1);
@@ -119,8 +119,9 @@ for agent = 1:(N-1)
     end
 end
 
+% Constraints on control inputs and distances
 expr_h = vertcat(sym_u, ...
-                 sym_dist); % constraints on control inputs and distances
+                 sym_dist); 
 % expr_h_e = sym_x;
 
 %% Populate structure
