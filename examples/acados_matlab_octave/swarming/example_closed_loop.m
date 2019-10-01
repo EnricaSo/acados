@@ -55,7 +55,7 @@ sim_num_steps = 3;
 
 % OCP
 param_scheme = 'multiple_shooting_unif_grid';
-nlp_solver = 'sqp'; % sqp, sqp_rti
+nlp_solver = 'sqp_rti'; % sqp, sqp_rti
 nlp_solver_exact_hessian = 'false';
 regularize_method = 'no_regularize'; % no_regularize, project,...
 	% project_reduc_hess, mirror, convexify
