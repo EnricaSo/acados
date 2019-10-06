@@ -70,7 +70,7 @@ sym_nav = SX.zeros(N,1);
 
 % Neighborhood matrix
 % M = ones(N,N) - eye(N,N);
-[~, sorted_neig] = compute_neighborhood_casadi(pos, r_comm, max_neig);
+[~, sorted_neig] = compute_closest_neig(pos, r_comm, max_neig);
 
 % For every agent define the nonlinear_ls terms
 for agent = 1:N
