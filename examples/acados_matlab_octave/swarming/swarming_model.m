@@ -83,14 +83,14 @@ for agent = 1:N
             neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
         end
         % Separation term
-        p_rel = pos(neig_idx)-pos(agent_idx);
-        sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(p_rel'*p_rel - d_ref^2);
+        pos_rel = pos(neig_idx)-pos(agent_idx);
+        sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(pos_rel'*pos_rel - d_ref^2);
     end
-    v_agent = vel(agent_idx);
+    vel_agent = vel(agent_idx);
     % Direction term
-    sym_dir(agent) = 1 - (v_agent'*u_ref)^2/(v_agent'*v_agent);
+    sym_dir(agent) = 1 - (vel_agent'*u_ref)^2/(vel_agent'*vel_agent);
     % Navigation term
-    sym_nav(agent) = v_agent'*v_agent - v_ref^2;
+    sym_nav(agent) = vel_agent'*vel_agent - v_ref^2;
 end
 
 sym_sep = W_sep * sym_sep;
@@ -113,8 +113,8 @@ for agent = 1:(N-1)
     agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
     for neig = (agent+1):N
         neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
-        p_rel = pos(neig_idx)-pos(agent_idx);
-        sym_dist(k) = p_rel(1)^2+p_rel(2)^2+p_rel(3)^2;
+        pos_rel = pos(neig_idx)-pos(agent_idx);
+        sym_dist(k) = pos_rel(1)^2+pos_rel(2)^2+pos_rel(3)^2;
         k = k+1;
     end
 end
