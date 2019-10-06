@@ -1,4 +1,4 @@
-function model = swarming_model_neig(S)
+function model = swarming_model_max_neig(S)
 
 % SWARMING_MODEL - Function that describes the dynamics of the swarm and
 % the cost function for controlling it.
@@ -62,13 +62,11 @@ expr_h = sym_u; % constraints only on control inputs, for now
 W_sep = 1; 
 W_dir = 1;
 W_nav = 2;
-W_u = 1e-1; % Penalization of high values of the control input variables
+W_u = 2e-1; % Penalization of high values of the control input variables
 
-sym_sep = SX.zeros(N*(N-1),1);
+sym_sep = SX.zeros(N*max_neig,1);
 sym_dir = SX.zeros(N,1);
 sym_nav = SX.zeros(N,1);
-
-%ny = N*(N+1);
 
 % Neighborhood matrix
 % M = ones(N,N) - eye(N,N);
@@ -83,7 +81,7 @@ for agent = 1:N
     % For every neighbor, compute the distance to the current agent
     for j = 1:max_neig
         neig = neigs(j);
-        neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
+        neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
         % Separation term
         pos_rel_cell = vertsplit(pos-repmat(pos(agent_idx),N,1));
         pos_rel_default = [d_ref;0;0];
@@ -94,7 +92,8 @@ for agent = 1:N
         pos_rel(1) = conditional(neig_idx_x, pos_rel_cell, pos_rel_default(1), false);
         pos_rel(2) = conditional(neig_idx_y, pos_rel_cell, pos_rel_default(2), false);
         pos_rel(3) = conditional(neig_idx_z, pos_rel_cell, pos_rel_default(3), false);
-        sym_sep((agent-1)*(N-1)+j) = 1/(N-1)*(pos_rel'*pos_rel - d_ref^2);
+        sym_sep((agent-1)*max_neig+j) = 1/max_neig*(pos_rel'*pos_rel - d_ref^2);
+        % TODO: Replace max_neig with the current number of neighbours
     end
     vel_agent = vel(agent_idx);
     % Direction term
