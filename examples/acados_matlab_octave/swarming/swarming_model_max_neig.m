@@ -89,6 +89,7 @@ for agent = 1:N
         neig_idx_x = neig_idx(1)-1;
         neig_idx_y = neig_idx(2)-1;
         neig_idx_z = neig_idx(3)-1;
+        % Conditional method only accept scalar index
         pos_rel(1) = conditional(neig_idx_x, pos_rel_cell, pos_rel_default(1), false);
         pos_rel(2) = conditional(neig_idx_y, pos_rel_cell, pos_rel_default(2), false);
         pos_rel(3) = conditional(neig_idx_z, pos_rel_cell, pos_rel_default(3), false);

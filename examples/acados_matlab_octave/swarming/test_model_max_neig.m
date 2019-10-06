@@ -49,7 +49,7 @@ for agent = 1:N
         end
         % Separation term
         p_rel = pos(neig_idx)-pos(agent_idx);
-        sym_sep((agent-1)*(N-1)+neig) = (p_rel'*p_rel - d_ref^2);
+        sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(p_rel'*p_rel - d_ref^2);
     end
 end
 
@@ -61,7 +61,6 @@ disp(sym_sep)
 [~, sorted_neig] = compute_neighborhood_casadi(pos, r_comm, max_neig);
 
 % For every agent define the nonlinear_ls terms
-sym_sep = SX.zeros(N*max_neig,1);
 for agent = 1:N
     
     % Get the index triplet related to the current agent
@@ -81,7 +80,8 @@ for agent = 1:N
         pos_rel(1) = conditional(neig_idx_x, pos_rel_cell, pos_rel_default(1), false);
         pos_rel(2) = conditional(neig_idx_y, pos_rel_cell, pos_rel_default(2), false);
         pos_rel(3) = conditional(neig_idx_z, pos_rel_cell, pos_rel_default(3), false);
-        sym_sep((agent-1)*max_neig+j) = (pos_rel'*pos_rel - d_ref^2);
+        sym_sep((agent-1)*max_neig+j) = 1/max_neig*(pos_rel'*pos_rel - d_ref^2);
+        % TODO: Replace max_neig with the current number of neighbours
     end
 end
 

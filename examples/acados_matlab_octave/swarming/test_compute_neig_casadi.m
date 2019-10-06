@@ -12,6 +12,6 @@ dist_matrix = squareform(dist);
 
 [M, sorted_neig] =  compute_neighborhood_casadi(position, r_comm, max_neig);
 
-dist(dist_matrix)
+disp(dist_matrix)
 disp(M)
 disp(sorted_neig)
