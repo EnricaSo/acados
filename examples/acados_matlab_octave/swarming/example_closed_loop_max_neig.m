@@ -55,7 +55,7 @@ sim_num_steps = 3;
 
 % OCP
 param_scheme = 'multiple_shooting_unif_grid';
-nlp_solver = 'sqp'; % sqp, sqp_rti
+nlp_solver = 'sqp_rti'; % sqp, sqp_rti
 nlp_solver_exact_hessian = 'false';
 regularize_method = 'no_regularize'; % no_regularize, project,...
 	% project_reduc_hess, mirror, convexify
@@ -94,7 +94,7 @@ nbu = 0;
 ng = 0;
 ng_e = 0;
 n_coll = N*(N-1)/2;
-nh = nu + n_coll;
+nh = nu;
 nh_e = 0;
 
 % Cost
@@ -116,8 +116,10 @@ lu = - max_a * ones(nu, 1);
 uu = max_a * ones(nu, 1);
 l_coll = r_coll^2 * ones(n_coll,1);
 u_coll = 300^2 * ones(n_coll,1);
-lh = [lu; l_coll];
-uh = [uu; u_coll];
+% lh = [lu; l_coll];
+lh = lu;
+% uh = [uu; u_coll];
+uh = uu;
 %lh_e = zeros(nh_e, 1);
 %uh_e = zeros(nh_e, 1);
 

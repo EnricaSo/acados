@@ -31,7 +31,7 @@ dist_matrix = squareform(dist);
 
 disp(dist_matrix)
 
-%% Copy-paste model without neig restriction
+%% Copy-paste separation cost without neig restriction
 
 % For every agent define the nonlinear_ls terms
 sym_sep = SX.zeros(N*(N-1),1);
@@ -57,7 +57,7 @@ end
 disp('---------- Output for model WITHOUT neig restriction ----------')
 disp(sym_sep)
 
-%% Copy-paste model with neig restriction
+%% Copy-paste separation cost with neig restriction
 
 [~, sorted_neig] = compute_closest_neig(pos, r_comm, max_neig);
 
