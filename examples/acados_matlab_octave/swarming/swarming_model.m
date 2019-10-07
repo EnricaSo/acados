@@ -76,15 +76,16 @@ for agent = 1:N
     agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
     
     % For every neighbor, compute the distance to the current agent
-    for neig = 1:(N-1)
-        if neig < agent
-            neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
+    for j = 1:(N-1)
+        if j < agent
+            neig = j;
         else
-            neig_idx = [1,2,3]' + 3*(neig)*ones(3,1);
+            neig = j+1;
         end
+        neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
         % Separation term
         pos_rel = pos(neig_idx)-pos(agent_idx);
-        sym_sep((agent-1)*(N-1)+neig) = 1/(N-1)*(pos_rel'*pos_rel - d_ref^2);
+        sym_sep((agent-1)*(N-1)+j) = 1/(N-1)*(pos_rel'*pos_rel - d_ref^2);
     end
     vel_agent = vel(agent_idx);
     % Direction term
