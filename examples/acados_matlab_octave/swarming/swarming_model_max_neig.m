@@ -68,16 +68,22 @@ sym_sep = SX.zeros(N*max_neig,1);
 sym_dir = SX.zeros(N,1);
 sym_nav = SX.zeros(N,1);
 
-% Neighborhood matrix
-% M = ones(N,N) - eye(N,N);
-[~, sorted_neig] = compute_closest_neig(pos, r_comm, max_neig);
+%% Compute neighbors
 
-% For every agent define the nonlinear_ls terms
+% Uncomment in case no restriction on neighbors apply
+% aux_matrix = repmat((1:N)',1,N)
+% upper = triu(aux_matrix,1);
+% lower = tril(aux_matrix,-1);
+% neig_matrix = upper(1:(N-1),:) + lower(2:N,:);
+
+[~, neig_matrix] = compute_closest_neig(pos, r_comm, max_neig);
+
+%% For every agent define the cost function terms
 for agent = 1:N
     
     % Get the index triplet related to the current agent
     agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
-    neigs = sorted_neig(:,agent);
+    neigs = neig_matrix(:,agent);
     % For every neighbor, compute the distance to the current agent
     for j = 1:max_neig
         neig = neigs(j);

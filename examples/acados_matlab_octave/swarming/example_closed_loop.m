@@ -12,6 +12,10 @@ end
 
 %% Arguments
 
+map = [];
+
+% Import map param, in map structure
+run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
 % Import swarming param, in S structure
 run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
 
@@ -93,9 +97,8 @@ nbx = 0;
 nbu = 0;
 ng = 0;
 ng_e = 0;
-n_coll = N*(N-1)/2;
-nh = nu + n_coll;
-nh_e = 0;
+% nh = nu;
+% nh_e = 0;
 
 % Cost
 W = eye(ny); % weight matrix in lagrange term
@@ -105,21 +108,12 @@ y_ref = zeros(ny, 1); % output reference in lagrange term
 y_ref_e = zeros(ny_e,1); % output reference in mayer term
 
 % Constraints
-% x0 = [S.Pos0(:); S.Vel0(:)];
-%rand('seed', 1);
-pos0 = 10*rand(3*N,1);
-%vel0 = 2*rand(3*N,1);
-vel0 = repmat([6;0;0],N,1) + 0.05*rand(3*N,1);
-x0 = [pos0; vel0];
+x0 = [S.Pos0(:); S.Vel0(:)];
+pos0 = S.Pos0(:);
 
-lu = - max_a * ones(nu, 1);
-uu = max_a * ones(nu, 1);
-l_coll = r_coll^2 * ones(n_coll,1);
-u_coll = 300^2 * ones(n_coll,1);
-lh = [lu; l_coll];
-uh = [uu; u_coll];
-%lh_e = zeros(nh_e, 1);
-%uh_e = zeros(nh_e, 1);
+% pos0 = 10*rand(3*N,1);
+% vel0 = repmat([6;0;0],N,1) + 0.05*rand(3*N,1);
+% x0 = [pos0; vel0];
 
 %% Acados ocp model
 
@@ -136,8 +130,8 @@ if strcmp(cost_type, 'nonlinear_ls')
 	ocp_model.set('dim_ny_e', ny_e);
 end
 
-ocp_model.set('dim_nh', nh);
-ocp_model.set('dim_nh_e', nh_e);
+ocp_model.set('dim_nh', model.nh);
+ocp_model.set('dim_nh_e', model.nh_e);
 
 % Symbolics
 ocp_model.set('sym_x', model.sym_x);
@@ -176,11 +170,11 @@ end
 ocp_model.set('constr_x0', x0);
 
 ocp_model.set('constr_expr_h', model.expr_h);
-ocp_model.set('constr_lh', lh);
-ocp_model.set('constr_uh', uh);
+ocp_model.set('constr_lh', model.lh);
+ocp_model.set('constr_uh', model.uh);
 % ocp_model.set('constr_expr_h_e', model.expr_h_e);
-% ocp_model.set('constr_lh_e', lh_e);
-% ocp_model.set('constr_uh_e', uh_e);
+% ocp_model.set('constr_lh_e', model.lh_e);
+% ocp_model.set('constr_uh_e', model.uh_e);
 
 ocp_model.model_struct
 
@@ -366,15 +360,16 @@ vel_history = x_history(:,(3*N+1):end);
 
 %% Plots with swarming functions
 
+pos_history_ned = pos_history.*repmat([1 1 -1],length(pos_history(:,1)),N);
+
 % Add project to path
 addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
 
 % Plot state variables
 colors = [];
-map = [];
 dirname = [];
-plot_state_variables_offline(time_history, pos_history, vel_history, ...
-    u_history, colors, S, [], fontsize, dirname);
+plot_state_variables_offline(time_history, pos_history_ned, vel_history, ...
+    u_history, colors, S, map, fontsize, dirname);
 
 %% Plots without swarming functions
 

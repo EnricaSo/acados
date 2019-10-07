@@ -27,6 +27,17 @@ u_ref = S.u_migration; % reference direction of velocity for all agents
 d_ref = S.d;  % reference distance among every couple of neighboring agents
 max_a = S.max_a;
 r_comm = S.r;
+r_coll = S.r_coll;
+
+% Obstacles
+nb_cylinders = S.n_cyl;
+if nb_cylinders > 0
+    c_obstacles = S.cylinders(1:2,:);
+    r_obstacles = S.cylinders(3,:);
+    M_obs = ones(nb_cylinders, N);
+end
+
+safety_margin = 0.2;
 
 %% System dimensions
 
@@ -107,23 +118,64 @@ ny_e = length(expr_y_e);
 
 %% Constraints
 
+%%%%%%%%% Constraints to avoid agent-agent collisions 
 sym_dist = SX.zeros(N*(N-1)/2,1);
+nh_agents = 0;
 
-k = 1;
 for agent = 1:(N-1)
     agent_idx = [1,2,3]' + 3*(agent-1)*ones(3,1);
     for neig = (agent+1):N
+        nh_agents = nh_agents +1;
         neig_idx = [1,2,3]' + 3*(neig-1)*ones(3,1);
         pos_rel = pos(neig_idx)-pos(agent_idx);
-        sym_dist(k) = pos_rel(1)^2+pos_rel(2)^2+pos_rel(3)^2;
-        k = k+1;
+        sym_dist(nh_agents) = pos_rel(1)^2+pos_rel(2)^2+pos_rel(3)^2;
     end
 end
 
-% Constraints on control inputs and distances
+%%%%%%%%% Constraints to avoid agent-obstacle collisions
+sym_dist_obs = SX.zeros(N*nb_cylinders,1);
+nh_obs = 0;
+lh_obs_coll = zeros(N*nb_cylinders,1);
+uh_obs_coll = zeros(N*nb_cylinders,1);
+
+if nb_cylinders > 0
+    for agent = 1:N
+        agent_idx = [1;2] + 3*(agent-1)*ones(2,1);
+        neig_obs = M_obs(:,agent);
+        nb_neig_obs = sum(neig_obs);
+        if sum(neig_obs) > 0
+            for j = 1:nb_neig_obs
+                nh_obs = nh_obs+1;
+                pos_rel_obs = pos(agent_idx) - c_obstacles(:,j);
+                sym_dist_obs(nh_obs) = pos_rel_obs(1)^2 + ...
+                    pos_rel_obs(2)^2 - r_obstacles(j)^2;
+                lh_obs_coll(nh_obs) = safety_margin^2;
+                uh_obs_coll(nh_obs) = 1e16;
+            end
+        end
+    end
+end
+
+% Gather contraints expressions in a single vector
 expr_h = vertcat(sym_u, ...
-                 sym_dist); 
+                 sym_dist, ...
+                 sym_dist_obs);
+nh = nu + nh_agents + nh_obs;
 % expr_h_e = sym_x;
+
+% Constraint bounds
+lh_u = - max_a * ones(nu, 1);
+uh_u = max_a * ones(nu, 1);
+lh_agent_coll = r_coll^2 * ones(nh_agents,1);
+uh_agent_coll = 300^2 * ones(nh_agents,1);
+
+if nb_cylinders > 0
+    lh = [lh_u; lh_agent_coll; lh_obs_coll];
+    uh = [uh_u; uh_agent_coll; uh_obs_coll];
+else
+    lh = [lh_u; lh_agent_coll];
+    uh = [uh_u; uh_agent_coll];
+end
 
 %% Populate structure
 
@@ -131,6 +183,9 @@ model.nx = nx;
 model.nu = nu;
 model.ny = ny;
 model.ny_e = ny_e;
+model.nh = nh;
+model.nh_e = 0;
+model.nh_e = 0;
 model.sym_x = sym_x;
 model.sym_xdot = sym_xdot;
 model.sym_u = sym_u;
@@ -140,4 +195,7 @@ model.expr_h = expr_h;
 % model.expr_h_e = expr_h_e;
 model.expr_y = expr_y;
 model.expr_y_e = expr_y_e;
-
+model.lh = lh;
+model.uh = uh;
+% model.lh_e = zeros(nh_e, 1);
+% model.uh_e = zeros(nh_e, 1);
