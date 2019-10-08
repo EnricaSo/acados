@@ -15,7 +15,7 @@ end
 map = [];
 
 % Import map param, in map structure
-run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
+% run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
 % Import swarming param, in S structure
 run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
 
@@ -295,6 +295,7 @@ sqp_iter = zeros(1, nb_steps_sim);
 time_tot = zeros(1, nb_steps_sim);
 time_lin = zeros(1, nb_steps_sim);
 time_qp_sol = zeros(1, nb_steps_sim);
+res = zeros(3, nb_steps_sim);
 
 tic;
 
@@ -318,6 +319,9 @@ for k = 1:nb_steps_sim
     time_tot(k) = ocp.get('time_tot');
     time_lin(k) = ocp.get('time_lin');
     time_qp_sol(k) = ocp.get('time_qp_sol');
+    stat = ocp.get('stat');
+%     ocp.print('stat');
+    res(:,k) = stat(end,:);
 
     fprintf('\nstatus = %d, sqp_iter = %d, time_tot = %f [ms] (time_lin = %f [ms], time_qp_sol = %f [ms])\n', status(k), sqp_iter(k), time_tot(k)*1e3, time_lin(k)*1e3, time_qp_sol(k)*1e3);
 
@@ -394,14 +398,16 @@ plot_state_variables_offline(time_history, pos_history_ned, vel_history, ...
 
 %% Show solver convergence
 
-figure;
-plot([1: nb_steps_sim], (sqp_iter), 'r-x');
-xlabel('Iteration','fontsize',fontsize)
-ylabel('Nb SQP iteration','fontsize',fontsize);
-ylim([0 Inf]);
+if (strcmp(nlp_solver, 'sqp'))
+    figure;
+    plot(1:nb_steps_sim, sqp_iter, 'r-x');
+    xlabel('Iteration','fontsize',fontsize)
+    ylabel('Nb SQP iteration','fontsize',fontsize);
+    ylim([0 Inf]);
+end
 
 figure;
-plot([1: nb_steps_sim], (time_tot*1e3), 'b-x');
+plot(1:nb_steps_sim, time_tot*1e3, 'b-x');
 xlabel('Iteration','fontsize',fontsize)
 ylabel('Simulation time [ms]','fontsize',fontsize);
 ylim([0 Inf]);
@@ -413,5 +419,11 @@ else
 	fprintf('\nsolution failed!\n\n');
 end
 
-waitforbuttonpress;
-return;
+%% Show residuals
+
+% figure;
+% plot(1:nb_steps_sim, res(1,:), 'r-x');
+% hold on;
+% plot(1:nb_steps_sim, res(2,:), 'b-x');
+% hold on;
+% plot(1:nb_steps_sim, res(3,:), 'g-x');
