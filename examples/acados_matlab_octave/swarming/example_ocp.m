@@ -304,10 +304,8 @@ map = [];
 pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
 plot_trajectories_offline(pos_history, N, [], fontsize, map);
-<<<<<<< e0d9f6ceaf281214fc57216197158d07ccd4cdbb
 axis equal
-=======
->>>>>>> Refactoring to use the Swarm method
+
 
 %% Show solver convergence
 
@@ -330,7 +328,10 @@ if status == 0
 else
 	fprintf('\nsolution failed!\n\n');
 end
+<<<<<<< 4b89f32091b62a1015e2de81d49bb6007377a5e9
 
 if is_octave
     waitforbuttonpress;
 end
+=======
+>>>>>>> Changed weights of cost function
