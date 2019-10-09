@@ -305,6 +305,7 @@ map = [];
 pos_history = x_history(:,1:3*N);
 vel_history = x_history(:,(3*N+1):end);
 plot_trajectories_offline(pos_history, N, [], fontsize, map);
+axis equal
 
 %% Show solver convergence
 

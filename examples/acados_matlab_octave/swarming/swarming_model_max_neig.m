@@ -60,8 +60,8 @@ expr_h = sym_u; % constraints only on control inputs, for now
 
 % Weights
 W_sep = 1; 
-W_dir = 1;
-W_nav = 2;
+W_dir = 5;
+W_nav = 5;
 W_u = 2e-1; % Penalization of high values of the control input variables
 
 sym_sep = SX.zeros(N*max_neig,1);
