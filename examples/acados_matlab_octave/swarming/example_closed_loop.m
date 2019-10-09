@@ -427,3 +427,8 @@ end
 % plot(1:nb_steps_sim, res(2,:), 'b-x');
 % hold on;
 % plot(1:nb_steps_sim, res(3,:), 'g-x');
+
+%% Show cost convergence
+
+cost = compute_cost_offline(S, model, pos_history, vel_history, u_history);
+plot(cost);

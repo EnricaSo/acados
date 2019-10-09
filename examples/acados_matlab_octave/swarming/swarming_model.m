@@ -199,3 +199,8 @@ model.lh = lh;
 model.uh = uh;
 % model.lh_e = zeros(nh_e, 1);
 % model.uh_e = zeros(nh_e, 1);
+
+model.W_sep = W_sep; 
+model.W_dir = W_dir;
+model.W_nav = W_nav;
+model.W_u = W_u;

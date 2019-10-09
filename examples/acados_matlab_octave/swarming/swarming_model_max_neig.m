@@ -136,3 +136,8 @@ model.expr_h = expr_h;
 model.expr_y = expr_y;
 model.expr_y_e = expr_y_e;
 
+
+model.W_sep = W_sep; 
+model.W_dir = W_dir;
+model.W_nav = W_nav;
+model.W_u = W_u;

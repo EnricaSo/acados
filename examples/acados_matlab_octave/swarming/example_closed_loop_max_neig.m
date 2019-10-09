@@ -420,5 +420,3 @@ else
 	fprintf('\nsolution failed!\n\n');
 end
 
-waitforbuttonpress;
-return;
