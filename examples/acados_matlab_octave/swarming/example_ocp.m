@@ -9,7 +9,7 @@
 clear all;
 close all;
 
-% Check that env.sh has been runz2
+% Check that env.sh has been run
 env_run = getenv('ENV_RUN');
 if (~strcmp(env_run, 'true'))
 	error('env.sh has not been sourced! Before executing this example, run: source env.sh');
