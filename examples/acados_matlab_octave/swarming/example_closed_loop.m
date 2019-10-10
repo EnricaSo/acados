@@ -436,7 +436,9 @@ end
 
 cost = compute_cost_offline(S, model, pos_history, vel_history, u_history);
 figure;
-plot(cost);
+plot(dt:dt:T_sim, cost);
+xlabel('Time [s]','fontsize',fontsize);
+ylabel('Cost function residuals','fontsize',fontsize)
 
 if status == 0
 	fprintf('\nsuccess!\n\n');
