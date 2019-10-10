@@ -15,9 +15,9 @@ end
 map = [];
 
 % Import map param, in map structure
-run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
+run('param_map');
 % Import swarming param, in S structure
-run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
+run('param_swarm');
 
 % Overwrite and add some param
 % S.nb_agents = 5;
@@ -371,37 +371,41 @@ vel_history = x_history(:,(3*N+1):end);
 
 %% Plots with swarming functions
 
-pos_history_ned = pos_history.*repmat([1 1 -1],length(pos_history(:,1)),N);
-
-% Add project to path
-addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
-
-% Plot state variables
-colors = [];
-dirname = [];
-plot_state_variables_offline(time_history, pos_history_ned, vel_history, ...
-    u_history, colors, S, map, fontsize, dirname);
+% pos_history_ned = pos_history.*repmat([1 1 -1],length(pos_history(:,1)),N);
+% 
+% % Add project to path
+% addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
+% 
+% % Plot state variables
+% colors = [];
+% dirname = [];
+% plot_state_variables_offline(time_history, pos_history_ned, vel_history, ...
+%     u_history, colors, S, map, fontsize, dirname);
 
 %% Plots without swarming functions
 
-% % Plot trajectories of the agents
-% figure;
-% for agent = 1:N
-%     hold on;
-%     plot3(pos_history(:,(agent-1)*3+1), pos_history(:,(agent-1)*3+2), ...
-%         - pos_history(:,(agent-1)*3+3));
-% end
-% % title('Agents trajectories');
-% xlabel('X Position [m]','fontsize',fontsize);
-% ylabel('Y Position [m]','fontsize',fontsize);
-% zlabel('Z Position [m]','fontsize',fontsize);
-% view(2);
-% 
-% figure;
-% plot(time_history(1:(end-1)), u_history);
-% xlim([0 time_history(end-1)]);
-% xlabel('Time [s]','fontsize',fontsize);
-% ylabel('Control inputs [m/s^2]','fontsize',fontsize);
+% Plot trajectories of the agents
+figure;
+if ~isempty(map)
+    draw_cylinders([],map);
+    hold on;
+end
+for agent = 1:N
+    hold on;
+    plot3(pos_history(:,(agent-1)*3+1), pos_history(:,(agent-1)*3+2), ...
+        pos_history(:,(agent-1)*3+3));
+end
+% title('Agents trajectories');
+xlabel('X Position [m]','fontsize',fontsize);
+ylabel('Y Position [m]','fontsize',fontsize);
+zlabel('Z Position [m]','fontsize',fontsize);
+view(2);
+
+figure;
+plot(time_history(1:(end-1)), u_history);
+xlim([0 time_history(end-1)]);
+xlabel('Time [s]','fontsize',fontsize);
+ylabel('Control inputs [m/s^2]','fontsize',fontsize);
 
 %% Show solver convergence
 
