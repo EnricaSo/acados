@@ -38,11 +38,11 @@ T_sim = 20; % time of the whole simulation [S]
 nb_steps_sim = floor(T_sim/dt); % nb of steps over the whole simulation
 
 if 1
-	compile_mex = 'true';
+	compile_interface = 'auto';
 	codgen_model = 'true';
 	gnsf_detect_struct = 'true';
 else
-	compile_mex = 'false';
+	compile_interface = 'auto';
 	codgen_model = 'false';
 	gnsf_detect_struct = 'false';
 end
@@ -189,7 +189,7 @@ ocp_model.model_struct
 %% Acados ocp options
 
 ocp_opts = acados_ocp_opts();
-ocp_opts.set('compile_mex', compile_mex);
+ocp_opts.set('compile_interface', compile_interface);
 ocp_opts.set('codgen_model', codgen_model);
 ocp_opts.set('param_scheme', param_scheme);
 ocp_opts.set('param_scheme_N', nb_steps);
@@ -264,7 +264,7 @@ end
 
 %% Acados simulation options
 sim_opts = acados_sim_opts();
-sim_opts.set('compile_mex', compile_mex);
+sim_opts.set('compile_interface', compile_interface);
 sim_opts.set('codgen_model', codgen_model);
 sim_opts.set('num_stages', sim_num_stages);
 sim_opts.set('num_steps', sim_num_steps);

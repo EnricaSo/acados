@@ -76,7 +76,7 @@ sym_nav = SX.zeros(N,1);
 % lower = tril(aux_matrix,-1);
 % neig_matrix = upper(1:(N-1),:) + lower(2:N,:);
 
-[~, neig_matrix] = compute_closest_neig(pos, r_comm, max_neig);
+[~, neig_matrix] = compute_closest_neighbors(pos, r_comm, max_neig);
 
 %% For every agent define the cost function terms
 for agent = 1:N

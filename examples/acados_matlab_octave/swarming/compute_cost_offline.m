@@ -1,4 +1,6 @@
 function cost = compute_cost_offline(S, model, pos_history, vel_history, u_history)
+% compute_cost_offline - function that allows to retrieve a vector of
+% values with the MPC cost at every time step.
 
 %% Rename parameters
 
@@ -17,6 +19,9 @@ W_sep = model.W_sep;
 W_dir = model.W_dir;
 W_nav = model.W_nav;
 W_u = model.W_u; % Penalization of high values of the control input variables
+
+
+%% Main loop to compute the MPC cost
 
 [nb_steps,~] = size(pos_history(1:(end-1),:));
 cost = zeros(nb_steps,1);

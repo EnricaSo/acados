@@ -1,4 +1,4 @@
-function [M, sorted_neig] =  compute_neighborhood_casadi(position, r_comm, max_neig)
+function [M, sorted_neig] =  compute_closest_neighbors(position, r_comm, max_neig)
 % compute_neighborhood_casadi - Build adjacency matrix
 %
 % Adjacency matrix M(i,j): 
