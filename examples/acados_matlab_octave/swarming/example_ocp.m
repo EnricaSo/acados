@@ -17,10 +17,10 @@ end
 
 %% Arguments
 
-% Import the S structure for swarming parameters
-run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
+% Import swarming and map parameters
+run('param_map');
+run('param_swarm');
 
-% Add parameters
 S.d = 5;
 
 % Time parameters
@@ -94,8 +94,8 @@ nbx = 0;
 nbu = 0;
 ng = 0;
 ng_e = 0;
-nh = nu;
-nh_e = 0;
+% nh = nu;
+% nh_e = 0;
 
 % Cost
 W = eye(ny); % weight matrix in lagrange term
@@ -110,11 +110,6 @@ y_ref_e = zeros(ny_e,1); % output reference in mayer term
 pos0 = 10*rand(3*N,1);
 vel0 = 2*rand(3*N,1);
 x0 = [pos0; vel0];
-
-lh = - max_a * ones(nh, 1);
-uh = max_a * ones(nh, 1);
-%lh_e = zeros(nh_e, 1);
-%uh_e = zeros(nh_e, 1);
 
 %% Acados ocp model
 
@@ -131,8 +126,8 @@ if strcmp(cost_type, 'nonlinear_ls')
 	ocp_model.set('dim_ny_e', ny_e);
 end
 
-ocp_model.set('dim_nh', nh);
-ocp_model.set('dim_nh_e', nh_e);
+ocp_model.set('dim_nh', model.nh);
+ocp_model.set('dim_nh_e', model.nh_e);
 
 % Symbolics
 ocp_model.set('sym_x', model.sym_x);
@@ -171,8 +166,8 @@ end
 ocp_model.set('constr_x0', x0);
 
 ocp_model.set('constr_expr_h', model.expr_h);
-ocp_model.set('constr_lh', lh);
-ocp_model.set('constr_uh', uh);
+ocp_model.set('constr_lh', model.lh);
+ocp_model.set('constr_uh', model.uh);
 % ocp_model.set('constr_expr_h_e', model.expr_h_e);
 % ocp_model.set('constr_lh_e', lh_e);
 % ocp_model.set('constr_uh_e', uh_e);
@@ -276,35 +271,39 @@ vel_history = x_history(:,(3*N+1):end);
 
 %% Plot variables without Swarm methods
 
-% fontsize = 12; % font size for plots
+fontsize = 12; % font size for plots
+
+% Plot
+figure;
+if ~isempty(map)
+    draw_cylinders([],map);
+    hold on;
+end
+
+for agent = 1:N
+    plot3(pos_history(:,(agent-1)*3+2), pos_history(:,(agent-1)*3+1), ...
+        pos_history(:,(agent-1)*3+3));
+    hold on;
+end
+% title('Swarm trajectories');
+xlabel('Y Position [m]','fontsize',fontsize);
+ylabel('X Position [m]','fontsize',fontsize);
+zlabel('Z Position [m]','fontsize',fontsize);
+view(2);
+
+%% Plot variables with Swarm methods
+
+% % Add project to path
+% addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
+% 
+% fontsize = 12;
+% map = [];
 % 
 % % Plot
 % pos_history = x_history(:,1:3*N);
 % vel_history = x_history(:,(3*N+1):end);
-% for agent = 1:N
-%     plot3(pos_history(:,(agent-1)*3+2), pos_history(:,(agent-1)*3+1), ...
-%         - pos_history(:,(agent-1)*3+3));
-%     hold on;
-% end
-% % title('Swarm trajectories');
-% xlabel('Y Position [m]','fontsize',fontsize);
-% ylabel('X Position [m]','fontsize',fontsize);
-% zlabel('Z Position [m]','fontsize',fontsize);
-% view(2);
-
-%% Plot variables with Swarm methods
-
-% Add project to path
-addpath(genpath('/home/esoria/Developer/sp2018_uavSim'));
-
-fontsize = 12;
-map = [];
-
-% Plot
-pos_history = x_history(:,1:3*N);
-vel_history = x_history(:,(3*N+1):end);
-plot_trajectories_offline(pos_history, N, [], fontsize, map);
-axis equal
+% plot_trajectories_offline(pos_history, N, [], fontsize, map);
+% axis equal
 
 
 %% Show solver convergence
