@@ -328,10 +328,7 @@ if status == 0
 else
 	fprintf('\nsolution failed!\n\n');
 end
-<<<<<<< 4b89f32091b62a1015e2de81d49bb6007377a5e9
 
 if is_octave
     waitforbuttonpress;
 end
-=======
->>>>>>> Changed weights of cost function

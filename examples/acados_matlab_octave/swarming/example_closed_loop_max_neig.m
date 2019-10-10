@@ -420,3 +420,6 @@ else
 	fprintf('\nsolution failed!\n\n');
 end
 
+if is_octave
+    waitforbuttonpress;
+end
