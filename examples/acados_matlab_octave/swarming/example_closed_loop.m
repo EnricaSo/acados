@@ -15,7 +15,7 @@ end
 map = [];
 
 % Import map param, in map structure
-% run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
+run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_forest');
 % Import swarming param, in S structure
 run('/home/esoria/Developer/sp2018_uavSim/swarming/param/param_swarm');
 
@@ -63,7 +63,7 @@ nlp_solver = 'sqp_rti'; % sqp, sqp_rti
 nlp_solver_exact_hessian = 'false';
 regularize_method = 'no_regularize'; % no_regularize, project,...
 	% project_reduc_hess, mirror, convexify
-nlp_solver_max_iter = 1000;
+nlp_solver_max_iter = 100;
 nlp_solver_tol_stat = 1e-6;
 nlp_solver_tol_eq   = 1e-6;
 nlp_solver_tol_ineq = 1e-6;
@@ -72,6 +72,7 @@ nlp_solver_step_length = 0.2;
 nlp_solver_ext_qp_res = 1; % with 10 nothing changes
 qp_solver = 'partial_condensing_hpipm';
         % full_condensing_hpipm, partial_condensing_hpipm
+qp_solver_iter_max = 50;
 qp_solver_cond_N = nb_steps/2;
 qp_solver_warm_start = 0;
 qp_solver_cond_ric_alg = 0; % 0: dont factorize hessian in the condensing; 1: factorize
@@ -200,6 +201,7 @@ if (strcmp(nlp_solver, 'sqp'))
     ocp_opts.set('nlp_solver_step_length', nlp_solver_step_length);
 end
 ocp_opts.set('qp_solver', qp_solver);
+ocp_opts.set('qp_solver_iter_max', qp_solver_iter_max);
 if (strcmp(qp_solver, 'partial_condensing_hpipm'))
 	ocp_opts.set('qp_solver_cond_N', qp_solver_cond_N);
 	ocp_opts.set('qp_solver_ric_alg', qp_solver_ric_alg);
@@ -295,7 +297,12 @@ sqp_iter = zeros(1, nb_steps_sim);
 time_tot = zeros(1, nb_steps_sim);
 time_lin = zeros(1, nb_steps_sim);
 time_qp_sol = zeros(1, nb_steps_sim);
-res = zeros(3, nb_steps_sim);
+
+if (strcmp(nlp_solver, 'sqp'))
+    res = zeros(7, nb_steps_sim);
+else
+    res = zeros(3, nb_steps_sim);
+end
 
 tic;
 
@@ -420,15 +427,20 @@ else
 end
 
 %% Show residuals
+if (strcmp(nlp_solver, 'sqp_rti'))
+    figure;
+    plot(1:nb_steps_sim, res(1,:), 'r-x');
+    hold on;
+    plot(1:nb_steps_sim, res(2,:), 'b-x');
+    hold on;
+    plot(1:nb_steps_sim, res(3,:), 'g-x');
+    legend('sqp iter', 'qp status', 'qp iter');
+else
 
-% figure;
-% plot(1:nb_steps_sim, res(1,:), 'r-x');
-% hold on;
-% plot(1:nb_steps_sim, res(2,:), 'b-x');
-% hold on;
-% plot(1:nb_steps_sim, res(3,:), 'g-x');
+end
 
 %% Show cost convergence
 
 cost = compute_cost_offline(S, model, pos_history, vel_history, u_history);
+figure;
 plot(cost);
